@@ -1,0 +1,15 @@
+{
+    "Servers": {
+        "1": {
+            "Name": "DigitalWallet-Local",
+            "Group": "Servers",
+            "Host": "postgres",
+            "Port": 5432,
+            "MaintenanceDB": "wallet_db",
+            "Username": "wallet_admin",
+            "Password": "secure_wallet_pass",
+            "SavePassword": true,
+            "SSLMode": "prefer"
+        }
+    }
+}

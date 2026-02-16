@@ -1,0 +1,31 @@
+<Solution>
+  <Folder Name="/Modules/" />
+  <Folder Name="/Modules/Users/">
+    <Project Path="src/Modules/Users/DigitalWallet.Modules.Users.Api/DigitalWallet.Modules.Users.Api.csproj" Id="03742f39-f56f-481a-a824-febf69dc8ab4" />
+    <Project Path="src/Modules/Users/DigitalWallet.Modules.Users.Application/DigitalWallet.Modules.Users.Application.csproj" />
+    <Project Path="src/Modules/Users/DigitalWallet.Modules.Users.Contracts/DigitalWallet.Modules.Users.Contracts.csproj" />
+    <Project Path="src/Modules/Users/DigitalWallet.Modules.Users.Domain/DigitalWallet.Modules.Users.Domain.csproj" />
+    <Project Path="src/Modules/Users/DigitalWallet.Modules.Users.Infrastructure/DigitalWallet.Modules.Users.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Read/">
+    <Project Path="src/Read/DigitalWallet.Read.Api/DigitalWallet.Read.Api.csproj" />
+    <Project Path="src/Read/DigitalWallet.Read.Storage/DigitalWallet.Read.Storage.csproj" />
+  </Folder>
+  <Folder Name="/Shared/">
+    <Project Path="src/Shared/DigitalWallet.Shared.Api/DigitalWallet.Shared.Api.csproj" />
+    <Project Path="src/Shared/DigitalWallet.Shared.Application/DigitalWallet.Shared.Application.csproj" />
+    <Project Path="src/Shared/DigitalWallet.Shared.Domain/DigitalWallet.Shared.Domain.csproj" />
+    <Project Path="src/Shared/DigitalWallet.Shared.Infrastructure/DigitalWallet.Shared.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".env.example" />
+    <File Path="docker-compose.override.yml" />
+    <File Path="docker-compose.yml" />
+  </Folder>
+  <Project Path="docker-compose.dcproj">
+    <Build />
+  </Project>
+  <Project Path="src/DigitalWallet.Host/DigitalWallet.Host.csproj" />
+  <Project Path="src/DigitalWallet.ReadWorker/DigitalWallet.ReadWorker.csproj" Id="b138dad3-12ec-44a2-a0e8-b699ac3ca5e6" />
+</Solution>

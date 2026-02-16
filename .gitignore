@@ -7,6 +7,11 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/Dotnet.gitignore
 
+# IDE folders
+.vs/
+.idea/
+.vscode/
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
@@ -52,3 +57,13 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# 1. Ignore all files starting with .env
+.env*
+
+# 2. But do NOT ignore .env.example
+!.env.example
+
+# Ignore local .NET configuration files
+[Aa]ppsettings.Development.json
+[Aa]ppsettings.Local.json

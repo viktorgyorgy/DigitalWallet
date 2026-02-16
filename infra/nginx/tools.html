@@ -1,0 +1,160 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet | Dev Tools</title>
+    <style>
+        :root {
+            --bg: #0a0c10;
+            --card-bg: #161b22;
+            --border: #30363d;
+            --text: #c9d1d9;
+            --accent: #58a6ff;
+            --success: #238636;
+            --error: #da3633;
+            --warning: #d29922;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            text-align: center;
+        }
+
+        header { margin-bottom: 3rem; }
+        h1 { color: var(--accent); font-size: 2rem; letter-spacing: -1px; margin-bottom: 0.5rem; }
+
+        .badge {
+            background: rgba(88, 166, 255, 0.1);
+            color: var(--accent);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            border: 1px solid rgba(88, 166, 255, 0.2);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+            background: #1c2128;
+            transform: translateY(-3px);
+        }
+
+        .icon { font-size: 2.5rem; margin-bottom: 12px; }
+        .card h3 { margin: 10px 0 5px 0; font-size: 1.25rem; }
+        .card p { font-size: 0.9rem; color: #8b949e; margin: 0; }
+
+        /* Real Health Dot */
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-top: 15px;
+            background: var(--warning); /* Default to checking */
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .status-online { background: var(--success); box-shadow: 0 0 8px var(--success); }
+        .status-offline { background: var(--error); box-shadow: 0 0 8px var(--error); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Infrastructure Portal</h1>
+        <span class="badge">DEVELOPMENT ENVIRONMENT</span>
+    </header>
+
+    <div class="grid">
+        <a href="http://pgadmin.localhost" target="_blank" class="card" data-url="http://pgadmin.localhost">
+            <div class="icon">🐘</div>
+            <h3>pgAdmin</h3>
+            <p>PostgreSQL Database</p>
+            <div class="status-indicator"></div>
+        </a>
+
+        <a href="http://redpanda.localhost" target="_blank" class="card" data-url="http://redpanda.localhost">
+            <div class="icon">🎯</div>
+            <h3>Redpanda</h3>
+            <p>Kafka & Stream Console</p>
+            <div class="status-indicator"></div>
+        </a>
+
+        <a href="http://debezium.localhost" target="_blank" class="card" data-url="http://debezium.localhost">
+            <div class="icon">🔄</div>
+            <h3>Debezium</h3>
+            <p>Connectors & CDC</p>
+            <div class="status-indicator"></div>
+        </a>
+
+        <a href="http://mongo.localhost" target="_blank" class="card" data-url="http://mongo.localhost">
+            <div class="icon">🍃</div>
+            <h3>Mongo Express</h3>
+            <p>MongoDB Admin UI</p>
+            <div class="status-indicator"></div>
+        </a>
+    </div>
+
+    <footer style="margin-top: 50px; color: #484f58; font-size: 0.8rem;">
+        Gateway Running: <strong>wallet_gateway</strong> | Auto-refreshing every 10s
+    </footer>
+</div>
+
+<script>
+    async function checkHealth(card) {
+        const url = card.getAttribute('data-url');
+        const indicator = card.querySelector('.status-indicator');
+
+        try {
+            const response = await fetch(url, { mode: 'no-cors', cache: 'no-cache' });
+            indicator.className = 'status-indicator status-online';
+        } catch (error) {
+            indicator.className = 'status-indicator status-offline';
+        }
+    }
+
+    function updateAll() {
+        document.querySelectorAll('.card').forEach(checkHealth);
+    }
+
+    // Initial check
+    updateAll();
+    // Refresh every 10 seconds
+    setInterval(updateAll, 10000);
+</script>
+
+</body>
+</html>
