@@ -1,6 +1,5 @@
 ﻿using DigitalWallet.Shared.Application.Interfaces;
 using DigitalWallet.Shared.Infrastructure.Interfaces;
-using DigitalWallet.Shared.Infrastructure.Kafka;
 using DigitalWallet.Shared.Infrastructure.Security;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

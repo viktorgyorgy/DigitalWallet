@@ -1,43 +1,33 @@
 ﻿using Confluent.Kafka;
-using DigitalWallet.Shared.Domain.Events;
 using DigitalWallet.Shared.Infrastructure.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 
-namespace DigitalWallet.Shared.Infrastructure.Kafka;
+namespace DigitalWallet.Shared.Infrastructure;
 
-public class KafkaConsumer : IKafkaConsumer
+public class KafkaConsumer(IConfiguration config, ILogger<KafkaConsumer> logger) : IKafkaConsumer
 {
-    private readonly IConfiguration _config;
-    private readonly ILogger<KafkaConsumer> _logger;
+    private readonly IConfiguration _config = config;
+    private readonly ILogger<KafkaConsumer> _logger = logger;
 
-    public KafkaConsumer(IConfiguration config, ILogger<KafkaConsumer> logger)
+    public async Task SubscribeAsync(string schema, string subscriptionName, Func<string, string, Task> handler, CancellationToken ct)
     {
-        _config = config;
-        _logger = logger;
-    }
+        var env = _config["ENV_NAME"] ?? "dev";
 
-    public async Task SubscribeAsync<TEvent>(Func<TEvent, Task> handler, CancellationToken ct)
-        where TEvent : IIntegrationEvent
-    {
+        var topic = $"{env}.{schema}.events";
+
         var config = new ConsumerConfig
         {
-            // Use the internal Redpanda address from your docker-compose
             BootstrapServers = _config["KAFKA_BOOTSTRAP_SERVERS"] ?? "redpanda:29092",
-            GroupId = $"read-worker-{typeof(TEvent).Name}",
+            GroupId = $"{env}.{schema}.{subscriptionName}-group",
             AutoOffsetReset = AutoOffsetReset.Earliest,
-            EnableAutoCommit = true
+            EnableAutoCommit = true,
+            AllowAutoCreateTopics = true
         };
 
         using var consumer = new ConsumerBuilder<string, string>(config).Build();
-
-        // Debezium topic naming convention: {prefix}.{schema}.{table}
-        var env = _config["ENV_NAME"] ?? "dev";
-        var topic = $"{env}.users.users.outbox_messages";
-
         consumer.Subscribe(topic);
-        _logger.LogInformation("Subscribed to topic: {Topic} for event {Event}", topic, typeof(TEvent).Name);
+        _logger.LogInformation("Subscribed to topic: {Topic}", topic);
 
         while (!ct.IsCancellationRequested)
         {
@@ -46,41 +36,27 @@ public class KafkaConsumer : IKafkaConsumer
                 var result = consumer.Consume(ct);
                 if (result?.Message?.Value == null) continue;
 
-                using var jsonDoc = JsonDocument.Parse(result.Message.Value);
+                var typeHeaderBytes = result.Message.Headers.FirstOrDefault(h => h.Key == "eventType")?.GetValueBytes();
+                var eventType = typeHeaderBytes != null
+                    ? System.Text.Encoding.UTF8.GetString(typeHeaderBytes)
+                    : "Unknown";
 
-                if (!jsonDoc.RootElement.TryGetProperty("payload", out var payload) ||
-                    !payload.TryGetProperty("after", out var after) ||
-                    after.ValueKind == JsonValueKind.Null)
-                {
-                    continue;
-                }
-
-                // --- UPDATE 1: Match full class name ---
-                var eventType = after.GetProperty("type").GetString();
-                var targetType = typeof(TEvent).Name;
-
-                if (eventType != targetType) continue;
-
-                // --- UPDATE 2: Use "payload" instead of "data" ---
-                var eventDataJson = after.GetProperty("payload").GetString();
-                if (string.IsNullOrEmpty(eventDataJson)) continue;
-
-                var @event = JsonSerializer.Deserialize<TEvent>(eventDataJson);
-
-                if (@event != null)
-                {
-                    await handler(@event);
-                    _logger.LogDebug("Processed event: {Type}", eventType);
-                }
+                await handler(result.Message.Value, eventType);
             }
-            catch (OperationCanceledException) { break; }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (ConsumeException ex) when (ex.Error.Code == ErrorCode.UnknownTopicOrPart)
+            {
+                _logger.LogWarning("Topic {Topic} not yet created. Waiting 5s...", topic);
+                await Task.Delay(5000, ct);
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error consuming Kafka message from Debezium outbox");
-                await Task.Delay(2000, ct); // Prevent log spamming on connection failure
+                _logger.LogError(ex, "Error in consumer loop for {Topic}", topic);
+                await Task.Delay(2000, ct);
             }
         }
-
-        consumer.Close();
     }
 }

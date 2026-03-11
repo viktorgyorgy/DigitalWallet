@@ -171,7 +171,7 @@ services:
       migration-runner:
         condition: service_completed_successfully
     volumes:
-      - ./infra/debezium/configs:/templates:ro
+      - ./infra/debezium/templates:/templates:ro
       - ./infra/debezium/register-connectors.sh:/usr/local/bin/register-connectors.sh:ro
     environment:
       - POSTGRES_HOST

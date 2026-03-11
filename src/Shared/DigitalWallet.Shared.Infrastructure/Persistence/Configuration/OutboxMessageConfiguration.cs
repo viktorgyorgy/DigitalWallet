@@ -9,15 +9,18 @@ public class OutboxMessageConfiguration : IEntityTypeConfiguration<OutboxMessage
     public void Configure(EntityTypeBuilder<OutboxMessage> builder)
     {
         builder.HasKey(x => x.Id);
-        
+
+        builder.Property(x => x.AggregateId)
+            .IsRequired();
+
         builder.Property(x => x.Type).IsRequired();
-        
+
         builder.Property(x => x.Payload)
             .IsRequired()
-            .HasColumnType("jsonb"); 
-            
+            .HasColumnType("jsonb");
+
         builder.Property(x => x.CreatedAt).IsRequired();
-        
+
         builder.ToTable("outbox_messages");
     }
 }

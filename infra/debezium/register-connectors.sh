@@ -1,40 +1,25 @@
 #!/bin/sh
-
-# Install dependencies
 apk add --no-cache curl gettext
 
-echo "Waiting for Debezium at http://debezium:8083..."
-until curl -s -o /dev/null -w "%{http_code}" http://debezium:8083/connectors | grep -q "200"; do
-  sleep 2
-done
+echo "Waiting for Debezium..."
+until curl -s http://debezium:8083/connectors > /dev/null; do sleep 2; done
 
-echo "Debezium is UP. Processing templates..."
+# Define which schemas need an outbox connector
+SCHEMAS="users"
 
-for f in /templates/*.json.template; do
-  # Get filename without path and extension
-  connector_name=$(basename "$f" .json.template)
-  
-  echo "--------------------------------------------------"
-  echo "Processing: $connector_name"
-  
-  # Inject environment variables into the template
-  envsubst < "$f" > "/tmp/config.json"
-  
-  # Register/Update the connector (PUT makes it idempotent)
-  RESPONSE=$(curl -s -w "\n%{http_code}" -X PUT \
+for SCHEMA in $SCHEMAS; do
+  export SCHEMA_NAME=$SCHEMA
+  connector_name="${SCHEMA}-outbox-connector"
+
+  echo "Registering connector for schema: $SCHEMA_NAME"
+
+  envsubst < "/templates/outbox-connector.json.template" > "/tmp/config.json"
+
+  curl -s -X PUT \
     -H "Content-Type: application/json" \
     --data @/tmp/config.json \
-    "http://debezium:8083/connectors/$connector_name/config")
+    "http://debezium:8083/connectors/$connector_name/config" \
+    -o /dev/null
 
-  HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
-  
-  if [ "$HTTP_STATUS" -eq 200 ] || [ "$HTTP_STATUS" -eq 201 ]; then
-    echo "Successfully registered $connector_name (Status: $HTTP_STATUS)"
-  else
-    echo "Failed to register $connector_name (Status: $HTTP_STATUS)"
-    echo "Response: $(echo "$RESPONSE" | head -n1)"
-  fi
+  echo "Done: $connector_name"
 done
-
-echo "--------------------------------------------------"
-echo "Debezium configuration complete."

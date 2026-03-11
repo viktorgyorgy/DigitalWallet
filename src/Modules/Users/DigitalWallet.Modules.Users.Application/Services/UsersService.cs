@@ -48,11 +48,6 @@ public class UsersService
             throw new InvalidRequestException(errors);
         }
 
-        if (await _userRepository.ExistsByEmailAsync(request.Email, ct))
-        {
-            throw new InvalidOperationException("User already exists.");
-        }
-
         var passwordHash = _passwordHasher.Hash(request.Password);
 
         var user = new User
@@ -72,10 +67,10 @@ public class UsersService
             user.FirstName,
             user.LastName,
             Guid.NewGuid(),
-            _timeProvider.GetUtcNow().UtcDateTime
+            user.CreatedAt
         );
 
-        var outboxMessage = OutboxMessage.FromEvent(integrationEvent);
+        var outboxMessage = OutboxMessage.FromEvent(integrationEvent, user.Id);
 
         await _outboxRepository.AddAsync(outboxMessage);
 

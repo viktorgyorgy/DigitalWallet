@@ -5,6 +5,7 @@ using DigitalWallet.Modules.Users.Application.Validators;
 using DigitalWallet.Modules.Users.Infrastructure.Persistence;
 using DigitalWallet.Modules.Users.Infrastructure.Persistence.Repositories;
 using DigitalWallet.Shared.Api.Interfaces;
+using DigitalWallet.Shared.Domain;
 using DigitalWallet.Shared.Infrastructure.Extensions;
 using FluentValidation;
 using Microsoft.AspNetCore.Builder;
@@ -23,7 +24,7 @@ public class UsersModule : IModule
     public void RegisterModule(IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddModuleDbContext<UsersDbContext>(configuration, "users");
+        services.AddModuleDbContext<UsersDbContext>(configuration, Schemas.Users);
 
         services.AddValidatorsFromAssemblyContaining<RegisterUserRequestValidator>();
 

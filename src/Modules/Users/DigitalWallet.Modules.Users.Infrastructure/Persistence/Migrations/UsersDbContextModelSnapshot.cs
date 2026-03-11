@@ -30,7 +30,7 @@ namespace DigitalWallet.Modules.Users.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
@@ -73,12 +73,17 @@ namespace DigitalWallet.Modules.Users.Infrastructure.Persistence.Migrations
                     b.ToTable("users", "users");
                 });
 
-            modelBuilder.Entity("DigitalWallet.Shared.Infrastructure.Entities.OutboxMessage", b =>
+            modelBuilder.Entity("DigitalWallet.Shared.Application.OutboxMessage", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
+
+                    b.Property<string>("AggregateId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("aggregate_id");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")

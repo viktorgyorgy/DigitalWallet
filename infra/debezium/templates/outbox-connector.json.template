@@ -1,0 +1,32 @@
+{
+  "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+  "database.hostname": "${POSTGRES_HOST}",
+  "database.port": "5432",
+  "database.user": "${POSTGRES_USER}",
+  "database.password": "${POSTGRES_PASSWORD}",
+  "database.dbname": "${POSTGRES_DB}",
+  "topic.prefix": "${ENV_NAME}.${SCHEMA_NAME}",
+  "schema.include.list": "${SCHEMA_NAME}",
+  "table.include.list": "${SCHEMA_NAME}.outbox_messages",
+  "plugin.name": "pgoutput",
+  "tombstones.on.delete": "false",
+  "slot.name": "debezium_${SCHEMA_NAME}_slot",
+  "publication.name": "dbz_publication_${SCHEMA_NAME}",
+  "publication.autocreate.mode": "filtered",
+  "skipped.operations": "u,d,t",
+
+  "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+  "value.converter.schemas.enable": "false",
+  "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+  "key.converter.schemas.enable": "false",
+
+  "transforms": "outbox",
+  "transforms.outbox.type": "io.debezium.transforms.outbox.EventRouter",
+  "transforms.outbox.table.field.event.id": "id",
+  "transforms.outbox.table.field.event.payload": "payload",
+  "transforms.outbox.table.field.event.key": "aggregate_id",
+  "transforms.outbox.table.expand.json.payload": "true",
+  "transforms.outbox.table.fields.additional.placement": "id:header:id,type:header:eventType",
+  "transforms.outbox.route.by.field": "type",
+  "transforms.outbox.route.topic.replacement": "${ENV_NAME}.${SCHEMA_NAME}.events"
+}

@@ -8,4 +8,4 @@ public record UserRegisteredIntegrationEvent(
     string FirstName,
     string LastName,
     Guid EventId,
-    DateTime OccurredOn) : IIntegrationEvent;
+    DateTimeOffset OccurredOn) : IIntegrationEvent;
