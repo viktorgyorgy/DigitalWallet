@@ -9,6 +9,7 @@ using DigitalWallet.Shared.Api.Interfaces;
 using DigitalWallet.Shared.Domain;
 using DigitalWallet.Shared.Infrastructure.Extensions;
 using FluentValidation;
+using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
@@ -49,4 +50,7 @@ public class IdentityModule : IModule
         // Validation
         services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
     }
+
+    public void RegisterConsumers(IRiderRegistrationConfigurator rider) { }
+    public void ConfigureConsumerEndpoints(IKafkaFactoryConfigurator kafka, IRiderRegistrationContext context, IConfiguration configuration) { }
 }

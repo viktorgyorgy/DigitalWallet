@@ -1,72 +1,33 @@
-﻿namespace DigitalWallet.Modules.Users.Application.Services;
+﻿using DigitalWallet.Modules.Users.Application.Interfaces;
+using DigitalWallet.Modules.Users.Contracts.Events;
+using DigitalWallet.Modules.Users.Domain.Entities;
+using DigitalWallet.Shared.Application;
+using Microsoft.Extensions.Logging;
 
-public class UsersService
+namespace DigitalWallet.Modules.Users.Application.Services;
+
+public class UsersService(
+    IUserRepository userRepository,
+    IUsersOutboxRepository outboxRepository,
+    IUsersUnitOfWork unitOfWork,
+    TimeProvider timeProvider,
+    ILogger<UsersService> logger)
 {
-    //private readonly IUserRepository _userRepository;
-    //private readonly IUsersOutboxRepository _outboxRepository;
-    //private readonly IPasswordHasher _passwordHasher;
-    //private readonly IUsersUnitOfWork _unitOfWork;
-    //private readonly IValidator<RegisterUserRequest> _validator;
-    //private readonly TimeProvider _timeProvider;
+    public async Task CreateProfileAsync(Guid identityId, string email, string firstName, string lastName, CancellationToken ct)
+    {
+        // Idempotency Check
+        if (await userRepository.ExistsAsync(identityId, ct))
+        {
+            logger.LogWarning("User profile for {Id} already exists. Skipping.", identityId);
+            return;
+        }
 
-    //public UsersService(IUserRepository userRepository,
-    //    IUsersOutboxRepository outboxRepository,
-    //    IPasswordHasher passwordHasher,
-    //    IUsersUnitOfWork unitOfWork,
-    //    IValidator<RegisterUserRequest> validator,
-    //    TimeProvider timeProvider)
-    //{
-    //    _userRepository = userRepository;
-    //    _outboxRepository = outboxRepository;
-    //    _passwordHasher = passwordHasher;
-    //    _unitOfWork = unitOfWork;
-    //    _validator = validator;
-    //    _timeProvider = timeProvider;
-    //}
+        var user = new User(identityId, email, firstName, lastName, timeProvider.GetUtcNow().UtcDateTime);
+        await userRepository.AddAsync(user, ct);
 
-    //public async Task<RegisterUserResponse> RegisterUserAsync(RegisterUserRequest request, CancellationToken ct = default)
-    //{
-    //    var validationResult = await _validator.ValidateAsync(request, ct);
-    //    if (!validationResult.IsValid)
-    //    {
-    //        var errors = validationResult.Errors
-    //            .GroupBy(e => e.PropertyName)
-    //            .ToDictionary(
-    //                g => g.Key,
-    //                g => g.Select(x => x.ErrorMessage).ToArray()
-    //            );
+        var @event = new UserCreatedIntegrationEvent(user.Id, user.Email, user.FirstName, user.LastName, Guid.NewGuid(), user.CreatedAt);
+        await outboxRepository.AddAsync(OutboxMessage.FromEvent(@event, user.Id));
 
-    //        throw new InvalidRequestException(errors);
-    //    }
-
-    //    var passwordHash = _passwordHasher.Hash(request.Password);
-
-    //    var user = new User
-    //    (
-    //        request.Email,
-    //        request.FirstName,
-    //        request.LastName,
-    //        passwordHash,
-    //        _timeProvider.GetUtcNow().UtcDateTime
-    //    );
-
-    //    await _userRepository.AddAsync(user, ct);
-
-    //    var integrationEvent = new UserCreatedIntegrationEvent(
-    //        user.Id,
-    //        user.Email,
-    //        user.FirstName,
-    //        user.LastName,
-    //        Guid.NewGuid(),
-    //        user.CreatedAt
-    //    );
-
-    //    var outboxMessage = OutboxMessage.FromEvent(integrationEvent, user.Id);
-
-    //    await _outboxRepository.AddAsync(outboxMessage);
-
-    //    await _unitOfWork.SaveChangesAsync(ct);
-
-    //    return new RegisterUserResponse(user.Id, user.Email);
-    //}
+        await unitOfWork.SaveChangesAsync(ct);
+    }
 }

@@ -28,5 +28,9 @@
   "transforms.outbox.table.expand.json.payload": "true",
   "transforms.outbox.table.fields.additional.placement": "id:header:id,type:header:eventType",
   "transforms.outbox.route.by.field": "type",
+  "topic.creation.default.replication.factor": "1",
+  "topic.creation.default.partitions": "1",
+  "topic.creation.enable": "true",
+  "topic.creation.default.cleanup.policy": "delete",
   "transforms.outbox.route.topic.replacement": "${ENV_NAME}.${SCHEMA_NAME}.events"
 }

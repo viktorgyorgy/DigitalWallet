@@ -164,6 +164,20 @@ services:
         condition: service_healthy
     networks:
       - wallet-network
+
+  redpanda-setup:
+    image: docker.redpanda.com/redpandadata/redpanda:latest
+    container_name: wallet_redpanda_setup
+    volumes:
+      - ./infra/redpanda/create-topics.sh:/usr/local/bin/create-topics.sh:ro
+    environment:
+      - ENV_NAME=${ENV_NAME}
+    entrypoint: [ "/bin/bash", "/usr/local/bin/create-topics.sh" ]
+    depends_on:
+      redpanda:
+        condition: service_healthy
+    networks:
+      - wallet-network
   
   debezium-setup:
     image: alpine:latest
@@ -171,6 +185,8 @@ services:
     depends_on:
       debezium:
         condition: service_healthy
+      redpanda-setup:
+        condition: service_completed_successfully
       migration-runner:
         condition: service_completed_successfully
     volumes:

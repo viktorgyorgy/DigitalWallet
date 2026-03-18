@@ -7,10 +7,13 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenApi("v1");
-builder.Services.AddSharedInfrastructure();
-builder.Services.AddWebInfrastructure(builder.Configuration);
 builder.Services.RegisterModules(builder.Configuration);
+builder.Services.AddOpenApi("v1");
+builder.Services.AddWebInfrastructure(builder.Configuration);
+builder.Services.AddSharedInfrastructure(builder.Configuration,
+    rider => ModuleExtensions.RegisterModuleConsumers(rider, builder.Configuration),
+    (k, context) => ModuleExtensions.ConfigureModuleEndpoints(k, context, builder.Configuration)
+);
 builder.Services.AddReadSide(builder.Configuration);
 
 var app = builder.Build();

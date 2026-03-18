@@ -6,15 +6,12 @@ namespace DigitalWallet.Modules.Users.Infrastructure.Persistence.Repositories;
 
 public class UserRepository(UsersDbContext context) : IUserRepository
 {
-    private readonly UsersDbContext _context = context;
+    public async Task<bool> ExistsAsync(Guid id, CancellationToken ct = default)
+        => await context.Users.AnyAsync(u => u.Id == id, ct);
 
     public async Task<bool> ExistsByEmailAsync(string email, CancellationToken ct = default)
-    {
-        return await _context.Users.AnyAsync(u => u.Email == email, ct);
-    }
+        => await context.Users.AnyAsync(u => u.Email == email, ct);
 
     public async Task AddAsync(User user, CancellationToken ct = default)
-    {
-        await _context.Users.AddAsync(user, ct);
-    }
+        => await context.Users.AddAsync(user, ct);
 }

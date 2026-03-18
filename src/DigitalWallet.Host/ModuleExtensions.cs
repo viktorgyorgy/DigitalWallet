@@ -1,37 +1,31 @@
 ﻿using DigitalWallet.Modules.Identity.Api;
 using DigitalWallet.Modules.Users.Api;
 using DigitalWallet.Shared.Api.Interfaces;
+using MassTransit;
 
 namespace DigitalWallet.Host;
 
 public static class ModuleExtensions
 {
+    private static readonly IModule[] _modules = [new UsersModule(), new IdentityModule()];
+
     public static IServiceCollection RegisterModules(
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        IModule[] modules = [new UsersModule(), new IdentityModule()];
-
-        foreach (IModule module in modules)
+        foreach (var module in _modules)
         {
             module.RegisterModule(services, configuration);
-
-            services.AddSingleton(module);
-
-            Console.WriteLine($"[Module Loader] Automatically registered: {module.Name}");
+            Console.WriteLine($"[Module Loader] Services registered for: {module.Name}");
         }
-
         return services;
     }
 
     public static IEndpointRouteBuilder MapModuleEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        var modules = endpoints.ServiceProvider.GetServices<IModule>();
-
-        foreach (var module in modules)
+        foreach (var module in _modules)
         {
             module.MapEndpoints(endpoints);
-            Console.WriteLine($"[Module Loader] Endpoints mapped for: {module.Name}");
         }
 
         return endpoints;
@@ -39,23 +33,29 @@ public static class ModuleExtensions
 
     public static void RunModuleMigrations(this IApplicationBuilder app)
     {
-        using var scope = app.ApplicationServices.CreateScope();
-        var modules = scope.ServiceProvider.GetServices<IModule>();
-
-        foreach (var module in modules)
+        foreach (var module in _modules)
         {
-            Console.WriteLine($"[Migrator] Applying migrations for: {module.Name}...");
+            module.ApplyMigrations(app);
+        }
+    }
 
-            try
-            {
-                module.ApplyMigrations(app);
-                Console.WriteLine($"[Migrator] Success: {module.Name}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[Migrator] Error applying migrations for {module.Name}: {ex.Message}");
-                throw;
-            }
+    public static void RegisterModuleConsumers(IRiderRegistrationConfigurator rider, IConfiguration configuration)
+    {
+        foreach (var module in _modules)
+        {
+            module.RegisterConsumers(rider);
+            Console.WriteLine($"[Module Loader] Kafka Consumers registered for: {module.Name}");
+        }
+    }
+
+    public static void ConfigureModuleEndpoints(
+    IKafkaFactoryConfigurator kafka,
+    IRiderRegistrationContext context,
+    IConfiguration configuration)
+    {
+        foreach (var module in _modules)
+        {
+            module.ConfigureConsumerEndpoints(kafka, context, configuration);
         }
     }
 }

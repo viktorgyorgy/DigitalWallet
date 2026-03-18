@@ -10,9 +10,9 @@ public class User
 
     private User() { }
 
-    public User(string email, string firstName, string lastName, DateTimeOffset createdAt)
+    public User(Guid id, string email, string firstName, string lastName, DateTimeOffset createdAt)
     {
-        Id = Guid.NewGuid();
+        Id = id;
         Email = email;
         FirstName = firstName;
         LastName = lastName;
