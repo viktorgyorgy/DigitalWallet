@@ -26,8 +26,8 @@ internal class UserProjector(
             {
                 switch (typeName)
                 {
-                    case nameof(UserRegisteredIntegrationEvent):
-                        var regEvent = Deserialize<UserRegisteredIntegrationEvent>(json);
+                    case nameof(UserCreatedIntegrationEvent):
+                        var regEvent = Deserialize<UserCreatedIntegrationEvent>(json);
                         await HandleRegistration(regEvent, stoppingToken);
                         break;
 
@@ -43,7 +43,7 @@ internal class UserProjector(
         }, stoppingToken);
     }
 
-    private async Task HandleRegistration(UserRegisteredIntegrationEvent @event, CancellationToken ct)
+    private async Task HandleRegistration(UserCreatedIntegrationEvent @event, CancellationToken ct)
     {
         _logger.LogInformation("Projecting registration for: {Email}", @event.Email);
 

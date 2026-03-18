@@ -1,5 +1,9 @@
 <Solution>
   <Folder Name="/Modules/" />
+  <Folder Name="/Modules/Identity/">
+    <Project Path="src/Modules/Identity/DigitalWallet.Modules.Identity.Contracts/DigitalWallet.Modules.Identity.Contracts.csproj" Id="0db973eb-ae2e-4648-98f4-e613839b9968" />
+    <Project Path="src/Modules/Identity/DigitalWallet.Modules.Identity/DigitalWallet.Modules.Identity.csproj" Id="99d8bbf8-4552-4ea5-b33d-afb5b903ffb3" />
+  </Folder>
   <Folder Name="/Modules/Users/">
     <Project Path="src/Modules/Users/DigitalWallet.Modules.Users.Api/DigitalWallet.Modules.Users.Api.csproj" Id="03742f39-f56f-481a-a824-febf69dc8ab4" />
     <Project Path="src/Modules/Users/DigitalWallet.Modules.Users.Application/DigitalWallet.Modules.Users.Application.csproj" />

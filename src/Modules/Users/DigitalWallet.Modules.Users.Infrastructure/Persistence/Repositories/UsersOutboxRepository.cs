@@ -1,9 +1,11 @@
 ﻿using DigitalWallet.Modules.Users.Application.Interfaces;
-using DigitalWallet.Shared.Infrastructure.Persistence.Repositories;
+using DigitalWallet.Shared.Application;
+using Microsoft.EntityFrameworkCore;
 
 namespace DigitalWallet.Modules.Users.Infrastructure.Persistence.Repositories;
 
-public class UsersOutboxRepository : UsersOutboxRepository<UsersDbContext>, IUsersOutboxRepository
+public class UsersOutboxRepository(UsersDbContext context) : IUsersOutboxRepository
 {
-    public UsersOutboxRepository(UsersDbContext context) : base(context) { }
+    private readonly DbSet<OutboxMessage> _outboxMessages = context.OutboxMessages;
+    public async Task AddAsync(OutboxMessage message) => await _outboxMessages.AddAsync(message);
 }

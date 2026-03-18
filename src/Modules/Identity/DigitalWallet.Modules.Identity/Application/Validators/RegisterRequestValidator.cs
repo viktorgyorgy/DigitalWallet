@@ -1,11 +1,11 @@
-﻿using DigitalWallet.Modules.Users.Application.DTOs;
+﻿using DigitalWallet.Modules.Identity.Application.DTOs;
 using FluentValidation;
 
-namespace DigitalWallet.Modules.Users.Application.Validators;
+namespace DigitalWallet.Modules.Identity.Application.Validators;
 
-public sealed class RegisterUserRequestValidator : AbstractValidator<RegisterUserRequest>
+internal sealed class RegisterRequestValidator : AbstractValidator<RegisterRequest>
 {
-    public RegisterUserRequestValidator()
+    public RegisterRequestValidator()
     {
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("Email is required.")

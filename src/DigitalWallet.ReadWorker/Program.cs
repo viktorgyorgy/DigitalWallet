@@ -5,7 +5,7 @@ using DigitalWallet.Shared.Infrastructure.Extensions;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-builder.Services.AddSharedInfrastructure(builder.Configuration);
+builder.Services.AddSharedInfrastructure();
 builder.Services.AddMongoDatabase(builder.Configuration);
 
 

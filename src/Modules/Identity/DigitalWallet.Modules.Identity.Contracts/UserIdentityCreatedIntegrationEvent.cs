@@ -1,8 +1,8 @@
 ﻿using DigitalWallet.Shared.Domain.Events;
 
-namespace DigitalWallet.Modules.Users.Contracts.Events;
+namespace DigitalWallet.Modules.Identity.Contracts;
 
-public record UserRegisteredIntegrationEvent(
+public record UserIdentityCreatedIntegrationEvent(
     Guid Id,
     string Email,
     string FirstName,

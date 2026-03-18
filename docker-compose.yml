@@ -15,6 +15,9 @@ services:
     environment:
       - ConnectionStrings__PostgresConnection
       - ConnectionStrings__MongoConnection
+      - Jwt__Secret=${JWT_SECRET}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
     networks:
       - wallet-network
 

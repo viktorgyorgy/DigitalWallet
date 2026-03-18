@@ -8,8 +8,8 @@ using Scalar.AspNetCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi("v1");
-builder.Services.AddSharedInfrastructure(builder.Configuration);
-builder.Services.AddWebInfrastructure();
+builder.Services.AddSharedInfrastructure();
+builder.Services.AddWebInfrastructure(builder.Configuration);
 builder.Services.RegisterModules(builder.Configuration);
 builder.Services.AddReadSide(builder.Configuration);
 

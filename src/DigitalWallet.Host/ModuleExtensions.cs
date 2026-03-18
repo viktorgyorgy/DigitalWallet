@@ -1,4 +1,5 @@
-﻿using DigitalWallet.Modules.Users.Api;
+﻿using DigitalWallet.Modules.Identity.Api;
+using DigitalWallet.Modules.Users.Api;
 using DigitalWallet.Shared.Api.Interfaces;
 
 namespace DigitalWallet.Host;
@@ -9,7 +10,7 @@ public static class ModuleExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        IModule[] modules = [new UsersModule()];
+        IModule[] modules = [new UsersModule(), new IdentityModule()];
 
         foreach (IModule module in modules)
         {

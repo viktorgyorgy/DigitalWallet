@@ -1,13 +1,10 @@
-﻿using DigitalWallet.Modules.Users.Api.Endpoints;
-using DigitalWallet.Modules.Users.Application.Interfaces;
+﻿using DigitalWallet.Modules.Users.Application.Interfaces;
 using DigitalWallet.Modules.Users.Application.Services;
-using DigitalWallet.Modules.Users.Application.Validators;
 using DigitalWallet.Modules.Users.Infrastructure.Persistence;
 using DigitalWallet.Modules.Users.Infrastructure.Persistence.Repositories;
 using DigitalWallet.Shared.Api.Interfaces;
 using DigitalWallet.Shared.Domain;
 using DigitalWallet.Shared.Infrastructure.Extensions;
-using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -25,12 +22,8 @@ public class UsersModule : IModule
         IConfiguration configuration)
     {
         services.AddModuleDbContext<UsersDbContext>(configuration, Schemas.Users);
-
-        services.AddValidatorsFromAssemblyContaining<RegisterUserRequestValidator>();
-
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUsersOutboxRepository, UsersOutboxRepository>();
-        services.AddScoped<IUsersUnitOfWork, UsersUnitOfWork>();
 
         services.AddScoped<UsersService>();
     }
@@ -39,9 +32,6 @@ public class UsersModule : IModule
     {
         var group = endpoints.MapGroup("users")
             .WithTags("Users");
-
-        group.MapPost("", UserEndpoints.HandleRegisterAsync)
-            .WithName("RegisterUser");
     }
 
     public void ApplyMigrations(IApplicationBuilder app)

@@ -54,12 +54,6 @@ namespace DigitalWallet.Modules.Users.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("last_name");
 
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("password_hash");
-
                     b.HasKey("Id")
                         .HasName("pk_users");
 
@@ -85,7 +79,7 @@ namespace DigitalWallet.Modules.Users.Infrastructure.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("aggregate_id");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
