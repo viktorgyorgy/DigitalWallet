@@ -12,6 +12,8 @@ services:
         condition: service_healthy
       migration-runner:
         condition: service_completed_successfully
+      redpanda-setup:
+        condition: service_completed_successfully
     environment:
       - ENV_NAME
       - KAFKA_BOOTSTRAP_SERVERS=redpanda:29092
@@ -55,7 +57,7 @@ services:
         condition: service_healthy
       redpanda:
         condition: service_healthy
-      debezium-setup:
+      redpanda-setup:
         condition: service_completed_successfully
     networks:
       - wallet-network
