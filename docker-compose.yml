@@ -13,6 +13,8 @@ services:
       migration-runner:
         condition: service_completed_successfully
     environment:
+      - ENV_NAME
+      - KAFKA_BOOTSTRAP_SERVERS=redpanda:29092
       - ConnectionStrings__PostgresConnection
       - ConnectionStrings__MongoConnection
       - Jwt__Secret=${JWT_SECRET}
